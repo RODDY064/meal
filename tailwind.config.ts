@@ -11,6 +11,10 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        'primary-orange': '#FF5722',
+      },
+      fontFamily: {
+        sans: ["var(--font-geist)"],
       },
     },
   },
