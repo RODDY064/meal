@@ -1,9 +1,12 @@
 import Image from "next/image";
+import HeroText from "./ui/hero-text";
+import Container from "./ui/container";
 
 export default function Home() {
   return (
-    <main className="flexl flex-col items-center m-24">
-    <h1 className="font-sans">Hello</h1>
+    <main className="flex flex-col items-center  mt-12">
+      <HeroText/>
+      <Container/>
     </main>
   );
 }

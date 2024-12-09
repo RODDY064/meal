@@ -16,6 +16,9 @@ export default {
       fontFamily: {
         sans: ["var(--font-geist)"],
       },
+      boxShadow:{
+        'card':'0px 10px 48px -10px rgba(0,0,0,0.1)'
+      }
     },
   },
   plugins: [],
