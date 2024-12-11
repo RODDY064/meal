@@ -4,10 +4,13 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion } from "motion/react";
 import { createClient } from '@/utils/supabase/client';
+import { useBoundStore } from "@/store/store";
+import Link from "next/link";
 
 
 
 export default function Profile({ name}:{name?:string}) {
+  const { openModal} = useBoundStore();
   const [show, setShow] = useState(false);
   const [supabase] = useState(createClient); 
 
@@ -39,11 +42,13 @@ export default function Profile({ name}:{name?:string}) {
         animate={show ? "visible" : "hidden"}
         initial="hidden"
         className="drop-down absolute z-30 w-[12rem] pb-4 border border-primary-orange/20 shadow-card backdrop-blur-[12px] mt-2 right-2 rounded-xl p-4 list-none flex flex-col gap-1">
-          <motion.li variants={item}  className="text-md font-medium hover:text-primary-orange cursor-pointer flex md:hidden">
+          <motion.li
+           onClick={()=>openModal('create',null)}
+           variants={item}  className="text-md font-medium hover:text-primary-orange cursor-pointer flex md:hidden">
             Create recipe
           </motion.li>
           <motion.li variants={item}  className="text-md font-medium hover:text-primary-orange cursor-pointer">
-            Account
+           <Link href="/account">Account</Link>
           </motion.li>
           <motion.li variants={item} onClick={handleSignOut}  className="text-md font-medium hover:text-primary-orange cursor-pointer">
             Sign Out

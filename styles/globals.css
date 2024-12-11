@@ -71,7 +71,7 @@ body {
 }
 
 .app {
-  @apply relative z-10 flex justify-center items-center flex-col max-w-7xl mx-auto sm:px-16 px-6;
+  @apply relative z-10 flex justify-center items-center flex-col max-w-7xl mx-auto sm:px-16 px-6 ;
 }
 
 
@@ -89,4 +89,42 @@ body {
 .sub-intro {
   opacity: 0;
   transform: translateY(10px);
+}
+
+
+
+/* Scrollbar width and height for #inner-modal */
+#inner-modal::-webkit-scrollbar {
+  width: 12px; 
+
+
+}
+
+/* Scrollbar track (background area) */
+#inner-modal::-webkit-scrollbar-track {
+  background: #f3f4f6; /* Light gray background */
+  border-radius: 10px; /* Rounded corners */
+}
+
+/* Scrollbar thumb (the draggable handle) */
+#inner-modal::-webkit-scrollbar-thumb {
+  background: #9ca3af; /* Gray color */
+  border-radius: 10px; /* Rounded corners */
+  border: 2px solid #f3f4f6; /* Border effect */
+}
+
+/* Hover effect for the scrollbar thumb */
+#inner-modal::-webkit-scrollbar-thumb:hover {
+  background: #6b7280; /* Darker gray on hover */
+}
+
+/* For Firefox compatibility */
+#inner-modal {
+  scrollbar-color: #9ca3af #f3f4f6; 
+  scrollbar-width: thin; /* Thin scrollbar */
+}
+
+
+.resize-none {
+   resize: none;
 }

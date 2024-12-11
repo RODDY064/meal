@@ -44,7 +44,7 @@ export default function HeroText() {
           Your Recipe Haven
         </span>
       </h1>
-      <p className="desc text-gray-600 mt-5  mx-4 text-lg sm:text-xl max-w-2xl text-center opacity-0">
+      <p className="desc text-gray-600 mt-5  mx-6  md:mx-4 text-lg sm:text-xl max-w-2xl text-center opacity-0">
         Meal is your go-to platform for discovering, creating, and sharing
         delicious recipes. Whether you’re a seasoned chef or a kitchen newbie,
         explore a world of culinary inspiration in one simple, user-friendly

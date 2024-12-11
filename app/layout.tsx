@@ -1,17 +1,49 @@
 import type { Metadata } from "next";
 import "..//styles/globals.css";
-import { Geist } from "next/font/google";
 import Nav from "./ui/nav";
 import { AnimatePresence } from "motion/react";
 import { Toaster } from "react-hot-toast";
+import localFont from 'next/font/local'
+import ActionModal from "./ui/recipe-modals/action-modal";
 
-const giest = Geist({
-  subsets: ["latin"],
-  variable: "--font-geist",
-  display: "swap",
-  weight: ["200", "400", "300", "500", "700", "600","800"],
-  adjustFontFallback: false
-});
+
+const giest = localFont({
+ variable: "--font-geist",
+  src:[
+    {
+      path:"./fonts/Geist-Black.otf",
+      weight: "900",
+      style: "normal"
+    },
+    {
+      path:"./fonts/Geist-ExtraBold.otf",
+      weight: "800",
+      style: "normal"
+    },
+   {
+    path:"./fonts/Geist-Bold.otf",
+    weight: "700",
+    style: "normal"
+
+   },
+   {
+    path:"./fonts/Geist-Medium.otf",
+    weight: "500",
+    style: "normal"
+   },
+   {
+    path:"./fonts/Geist-Regular.otf",
+    weight: "400",
+    style: "normal"
+   },
+   {
+    path:"./fonts/Geist-Light.otf",
+    weight: "300",
+    style: "normal"
+   }
+  ]
+})
+
 
 export const metadata: Metadata = {
   title: "Meal",
@@ -30,12 +62,11 @@ export default function RootLayout({
         <div className="main">
           <div className="gradient" />
         </div>
-        <main className="app max-w-2xl 2xl:mx-auto">
+        <main className="app">
           <Toaster/>
           <Nav />
-         <AnimatePresence>
+          <ActionModal/>
          {children}
-         </AnimatePresence>
         </main>
       </body>
     </html>

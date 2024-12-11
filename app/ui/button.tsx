@@ -10,7 +10,7 @@ export default function Button({
   className
 }: {
   label: string;
-  action?: () => void;
+  action?: any;
   link?: boolean;
   href?: string;
   className?: string;
