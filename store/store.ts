@@ -13,7 +13,7 @@ import { SearchStore, useSearchStore } from "./search-store";
 
 export type Store = ActionModalStore & ViewModalStore & UserStore & InstructionStore & RecipeStore & SearchStore;
 
-export const useBoundStore = create<Store>()(
+export const useBoundStore = create<Store| any>()(
   immer((...a) => ({
     ...useActionModalStore(...a),
     ...useViewModalStore(...a),
