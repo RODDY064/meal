@@ -1,30 +1,31 @@
 // view-modal-store.ts
 import { StateCreator } from "zustand";
-import { Recipes } from "./recipe-store";
+import { FetchRecipes } from "./recipe-store";
+import { Store } from "./store";
 
 
 type ViewModalState = {
   viewOpen: boolean;
-  data: Recipes | null;
+  viewData: any;
 };
 
 type ViewModalFunctions = {
-  openViewModal: (data: Recipes) => void;
+  openViewModal: (viewData: FetchRecipes) => void;
   closeViewModal: () => void;
 };
 
 export type ViewModalStore = ViewModalState & ViewModalFunctions;
 
 export const useViewModalStore: StateCreator<
-  ViewModalStore,
-  [["zustand/immer", never]],
+  Store,
+  [["zustand/immer",never]],
   [],ViewModalStore> = (set) => ({
   viewOpen: false,
-  data: null,
-  openViewModal: (data) => {
-    set({ viewOpen: true, data });
+  viewData: null,
+  openViewModal: (viewData) => {
+    set({ viewOpen: true, viewData });
   },
   closeViewModal: () => {
-    set({ viewOpen: false, data: null });
+    set({ viewOpen: false, viewData: null });
   },
 })

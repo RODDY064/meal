@@ -128,3 +128,8 @@ body {
 .resize-none {
    resize: none;
 }
+
+.modal{
+  opacity: 0;
+  transform: translateY(20px);
+}

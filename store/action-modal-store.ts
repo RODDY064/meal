@@ -1,8 +1,7 @@
-import { create, StateCreator } from "zustand";
-import { User } from "@supabase/supabase-js";
-import { Recipes } from "./recipe-store";
+import { StateCreator } from "zustand";
+import { FetchRecipes, Recipes } from "./recipe-store";
 import { createClient } from "@/utils/supabase/client";
-import { useBoundStore } from "./store";
+import { Store } from "./store";
 
 const supabase =  createClient();
 
@@ -14,34 +13,34 @@ const supabase =  createClient();
 type ActionModalState = {
   isOpen: boolean;
   type: "create" | "edit";
-  recipes: Recipes | null;
 };
 
 // action modal functions
 type ActionModalFuctions = {
   openModal: (type: "create" | "edit", recipes: Recipes | null) => void;
-  closeModal: () => void;
+  closeModal: (ype: "create" | "edit") => void;
   createRecipe: (recipe: Recipes) => Promise<void>;
-  editRecipe: (recipe: Recipes) => Promise<void>;
-  setPulic: (recipe: Recipes) => void;
+  editRecipe: (recipe: FetchRecipes) => Promise<void>;
 };
 
 // action modal store type
 export type ActionModalStore = ActionModalState & ActionModalFuctions;
+
 // action modal store hooks
 export const useActionModalStore: StateCreator<
-  ActionModalStore,
+  Store,
   [["zustand/immer", never]],
   [],
   ActionModalStore> = (set) => ({
+
   isOpen: false,
   type: "create",
-  recipes: null,
-  openModal: (type, recipes) => {
-    set({ isOpen: true, type, recipes:null});
+
+  openModal: (type,) => {
+    set({ isOpen: true, type });
   },
-  closeModal: () => {
-    set({ isOpen: false, type: "create", recipes: null });
+  closeModal: (type) => {
+    set({ isOpen: false, type: type,});
   },
   createRecipe: async (recipe) => {
     // create recipe
@@ -52,8 +51,6 @@ export const useActionModalStore: StateCreator<
       {
         ...recipe,
         ingredients:"",
-        image_url: '',
-        is_public: true,
         public_link: '',
       },
     ]);
@@ -68,10 +65,14 @@ export const useActionModalStore: StateCreator<
     }},
   editRecipe: async (recipe) => {
     // edit recipe
-    console.log(recipe);
-  },
-  setPulic: (recipe) => {
-    // set recipe to public
-    console.log(recipe);
+    const { data, error } = await supabase
+      .from('recipes')
+      .update(recipe)
+      .eq('id', recipe.id);
+
+    if (error) {
+      console.log(error);
+      throw new Error("Failed to update recipe");
+    }
   },
 });

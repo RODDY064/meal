@@ -23,7 +23,7 @@ export default  function Nav() {
      getUser();
 
     // Update button properties based on the pathname
-    if (pathname === "/auth/login") {
+    if (pathname === "/login") {
       setProps({ label: "Sign Up", href: "/signup" });
     } else {
       setProps({ label: "Sign In", href: "/login" });

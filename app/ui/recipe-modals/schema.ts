@@ -9,4 +9,6 @@ export const recipeSchema = z.object({
     image: z.string().url().optional(),
     category: z.string().min(3,{ message:"Category must contain at least 3 character(s)"}).max(50),
     tags: z.string().min(3,{message:"Tags must contain at least 3 character(s)"}).max(50),
+    image_url:z.string({ message:"Please upload and image."}).min(1,{message:"Please upload and image."}),
+    is_public: z.boolean()
 });

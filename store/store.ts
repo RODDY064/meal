@@ -11,9 +11,14 @@ import { RecipeStore, useRecipeStore } from "./recipe-store";
 import { SearchStore, useSearchStore } from "./search-store";
 
 
-export type Store = ActionModalStore & ViewModalStore & UserStore & InstructionStore & RecipeStore & SearchStore;
+export type Store = ActionModalStore &
+  ViewModalStore &
+  UserStore &
+  InstructionStore &
+  RecipeStore &
+  SearchStore;
 
-export const useBoundStore = create<Store| any>()(
+export const useBoundStore = create<Store>()(
   immer((...a) => ({
     ...useActionModalStore(...a),
     ...useViewModalStore(...a),

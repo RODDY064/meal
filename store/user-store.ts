@@ -1,23 +1,25 @@
 import { User } from "@supabase/supabase-js";
-import { StateCreator } from "zustand";
+import { type  StateCreator } from "zustand";
 import { createClient } from "@/utils/supabase/client";
+import { Store } from "./store";
+// import { v4 as uuidv4 } from 'uuid';
 
 const supabase = createClient();
 
 export type UserStore = {
-  user: User | null;
+  user: any ;
   getUser: () => Promise<void>;
 };
 
 export const useUser: StateCreator<
-  UserStore,
+  Store,
   [["zustand/immer", never]],
-  []
-> = (set) => ({
+  [],
+  UserStore> = (set) => ({
   user: null, // Initialize the user state as null
   getUser: async () => {
     try {
-      const { data, error } = await (await supabase).auth.getUser();
+      const { data, error } = await supabase.auth.getUser();
       if (error) throw error;
 
       set((state) => {

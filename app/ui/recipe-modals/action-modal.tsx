@@ -14,42 +14,88 @@ import { recipeSchema } from "./schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 
-
 // dynamic create and edit modal
 
 export default function ActionModal() {
-  const { isOpen, closeModal, type,instructions,intruText, createRecipe,user } = useBoundStore();
+  const {
+    isOpen,
+    closeModal,
+    type,
+    instructions,
+    intruText,
+    createRecipe,
+    user,
+    refeshData,
+    viewData,
+    addInstruction,
+    editRecipe,
+    closeViewModal
+  } = useBoundStore();
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
+    reset,
   } = useForm<z.infer<typeof recipeSchema>>({
     resolver: zodResolver(recipeSchema),
   });
 
-  // submit function 
-  const  onSubmit: SubmitHandler<z.infer<typeof recipeSchema>> = async(data) => {
+  // edit the recipe
 
+  useEffect(() => {
+    if (viewData) {
+      setValue("title", viewData?.title || "");
+      setValue("description", viewData?.description || "");
+      setValue("tags", viewData?.tags ? viewData?.tags.join(",") : "");
+      setValue("category", viewData?.category);
+      setValue("is_public", viewData?.is_public ?? false);
+      setValue('image_url',viewData.image_url)
+
+      viewData.instructions.forEach((item:string) => {
+        addInstruction(null, item);
+      });
+    } else {
+      setValue("title", "");
+      setValue("description", "");
+      setValue("tags", "");
+      setValue("category", "");
+      setValue("instructions", []);
+      setValue("is_public", false);
+      setValue('image_url','')
+    }
+  }, [viewData]);
+
+  // submit function
+  const onSubmit: SubmitHandler<z.infer<typeof recipeSchema>> = async (
+    data
+  ) => {
     try {
       const recipeData = {
         ...data,
         user_id: user?.id ?? null,
-        tags: data.tags.split(",").map(tag => tag.trim()), 
+        tags: data.tags.split(",").map((tag) => tag.trim()),
       };
-      console.log(recipeData);
-      await createRecipe(recipeData);
-     
-      toast.success("Recipe created successfully");
-      closeModal();
+      // console.log(recipeData);
 
+      // call the  function base on the type
+      type === "create"
+        ? await createRecipe(recipeData)
+        : await editRecipe({ id: viewData?.id, ...recipeData });
+
+     toast.success(type === 'create' ? 'Recipe created successfully!' : 'Recipe updated successfully!');
+
+     
+      reset();
+      closeModal(type);
+      closeViewModal()
+      refeshData();
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
-
-   // animation
+  // animation
   useGSAP(() => {
     gsap.registerPlugin(useGSAP);
     const tl = gsap.timeline();
@@ -63,17 +109,17 @@ export default function ActionModal() {
         duration: 0.3,
         zIndex: 10000,
         backdropFilter: "blur(12px)",
-      }).from(".action-inner-modal",
-        {
-          ...animateFromWhere,
-          opacity: 0,
-          duration: 0.3,
-        });
+      }).from(".action-inner-modal", {
+        ...animateFromWhere,
+        opacity: 0,
+        duration: 0.3,
+      });
     } else {
       tl.to(".action-modal", {
         opacity: 0,
-        duration: 0.5,
+        duration: 0.3,
         zIndex: -20,
+        backdropFilter: "blur(0)",
       });
     }
   }, [isOpen]);
@@ -81,15 +127,19 @@ export default function ActionModal() {
   return (
     <div
       className="action-modal w-full h-full fixed top-0 left-0 flex flex-col items-center lg:items-end p-4 z-[-20]
-     bg-white/20 pt-12 md:pt-4 overflow-y-scroll  opacity-0">
-      <div className="action-inner-modal w-[96%] md:w-[70%]  lg:w-[42%] xl:w-2/6 h-fit md:min-h-full  break-inside-avoid  rounded-2xl md:rounded-3xl relative  bg-white bg-clip-padding border border-primary-orange/70 ">
-        <form onSubmit={handleSubmit(onSubmit)} className="w-full h-full md:overflow-y-scroll md:p-4 p-3 overflow-x-visible">
+     bg-white/30 pt-12 md:pt-4 overflow-y-scroll  opacity-0"
+    >
+      <div className="action-inner-modal w-[96%] md:w-[70%]  lg:w-[42%] xl:w-2/6 h-fit md:min-h-full  break-inside-avoid  rounded-2xl md:rounded-3xl relative  bg-white bg-clip-padding border border-primary-orange/70 overflow-hidden">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="w-full h-full md:overflow-y-scroll md:p-4 p-3 overflow-x-visible"
+        >
           <div className="flex justify-between">
             <h1 className="font-sans text-xl font-semibold">
               {type === "create" ? "Create" : "Edit"} a recipe
             </h1>
             <div
-              onClick={closeModal}
+              onClick={() => closeModal(type)}
               className="close-modal cursor-pointer size-8 rounded-full bg-white/10 shadow-[inset_10px_-50px_94px_0_rgb(199,199,199,0.2)] backdrop-blur flex justify-center items-center "
             >
               <Image
@@ -108,14 +158,20 @@ export default function ActionModal() {
                 className="w-full h-10 text-lg rounded-lg focus:outline-none
           hover:border-primary-orange/70 border border-white p-2"
               />
-              {errors.title && <p className="text-red-500 my-2 font-sans text-sm mx-2">{errors.title.message}</p>}
+              {errors.title && (
+                <p className="text-red-500 my-2 font-sans text-sm mx-2">
+                  {errors.title.message}
+                </p>
+              )}
             </div>
             <div className="flex flex-col mt-2">
               <label className="text-sm font-sans font-medium text-black/40 mx-2">
                 Desciption
               </label>
               <textarea
-                {...register("description", { required: "Description is required" })}
+                {...register("description", {
+                  required: "Description is required",
+                })}
                 placeholder="Write the description of the recipe"
                 className="w-full min-h-24 rounded-lg focus:outline-none hover:border-primary-orange/70 border border-white p-2 resize-none"
                 onInput={(e: any) => {
@@ -123,7 +179,11 @@ export default function ActionModal() {
                   e.target.style.height = `${e.target.scrollHeight}px`; // Set height based on content
                 }}
               />
-              {errors.description && <p className="text-red-500 my-2 font-sans text-sm mx-2">{errors.description.message}</p>}
+              {errors.description && (
+                <p className="text-red-500 my-2 font-sans text-sm mx-2">
+                  {errors.description.message}
+                </p>
+              )}
             </div>
             <div className="flex flex-col mt-4 relative">
               <label className="text-sm font-sans font-medium text-black/40 mx-2">
@@ -133,7 +193,8 @@ export default function ActionModal() {
                 <select
                   {...register("category")}
                   className="w-full h-10  rounded-lg focus:outline-none
-             hover:border-primary-orange/70 border border-white p-2 appearance-none cursor-pointer">
+             hover:border-primary-orange/70 border border-white p-2 appearance-none cursor-pointer"
+                >
                   <option>Breakfast</option>
                   <option>Lunch</option>
                 </select>
@@ -145,8 +206,13 @@ export default function ActionModal() {
                   className="absolute right-10"
                 />
               </div>
-              {errors.category && <p className="text-red-500 my-2 font-sans text-sm mx-2">{errors.category.message}</p>}
+              {errors.category && (
+                <p className="text-red-500 my-2 font-sans text-sm mx-2">
+                  {errors.category.message}
+                </p>
+              )}
             </div>
+
             <div className="flex flex-col mt-2">
               <label className="text-sm font-sans font-medium text-black/40 mx-2">
                 Tags
@@ -160,16 +226,34 @@ export default function ActionModal() {
                   e.target.style.height = `${e.target.scrollHeight}px`; // Set height based on content
                 }}
               />
-              {errors.tags && <p className="text-red-500 my-2 font-sans text-sm mx-2">{errors.tags.message}</p>}
+              {errors.tags && (
+                <p className="text-red-500 my-2 font-sans text-sm mx-2">
+                  {errors.tags.message}
+                </p>
+              )}
             </div>
-            <Instrcutions  setValue={setValue}/>
-            {errors.instructions && <p className="text-red-500 my-2 font-sans text-sm mx-2">{errors.instructions.message}</p>}
+            <Instrcutions setValue={setValue} />
+            {errors.instructions && (
+              <p className="text-red-500 my-2 font-sans text-sm mx-2">
+                {errors.instructions.message}
+              </p>
+            )}
           </div>
-          <ImageUpload />
-          <div className="w-full my-4 flex items-center justify-center gap-4">
-            <input type="submit" className="border border-black bg-black py-1.5 px-8 md:px-12 text-white transition-all hover:bg-transparent hover:text-black text-center text-sm font-sans items-center justify-center rounded-lg cursor-pointer"/>
-            <div onClick={closeModal} className="border border-black bg-black py-1.5 px-8 md:px-12 text-white transition-all hover:bg-transparent hover:text-black text-center text-sm font-sans items-center justify-center rounded-lg cursor-pointer">
-             Cancel
+          <ImageUpload setValue={setValue} errors={errors} />
+          <div className="mt-4 mb-10  flex items-center gap-4">
+            <label className="text-gray-500 font-sans">Mark it as public</label>
+            <input {...register("is_public")} type="checkbox" />
+          </div>
+          <div className="w-full my-4 mb-8 flex items-center justify-center gap-4">
+            <input
+              type="submit"
+              className="border border-black bg-black py-1.5 px-8 md:px-12 text-white transition-all hover:bg-transparent hover:text-black text-center text-sm font-sans items-center justify-center rounded-lg cursor-pointer"
+            />
+            <div
+              onClick={() => closeModal(type)}
+              className="border border-black bg-black py-1.5 px-8 md:px-12 text-white transition-all hover:bg-transparent hover:text-black text-center text-sm font-sans items-center justify-center rounded-lg cursor-pointer"
+            >
+              Cancel
             </div>
           </div>
         </form>

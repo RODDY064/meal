@@ -35,14 +35,15 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  const protectedRoutes = ['/account'];
+
+
   if (
     !user &&
     !request.nextUrl.pathname.startsWith('/login') &&
-    !request.nextUrl.pathname.startsWith('/auth') &&
     !request.nextUrl.pathname.startsWith('/signup') &&
-    !request.nextUrl.pathname.startsWith('/forgot-password') &&
-    !request.nextUrl.pathname.startsWith('/reset-password') &&
-    !request.nextUrl.pathname.startsWith('/')
+    !request.nextUrl.pathname.startsWith('/') 
+    && protectedRoutes.some((route) => request.nextUrl.pathname.startsWith(route))
 
   ) {
     // no user, potentially respond by redirecting the user to the login page

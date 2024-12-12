@@ -39,8 +39,8 @@ export default function Instructions({ setValue}:{ setValue:any}) {
   const handleDragEnd = (event: any) => {
     const { active, over } = event;
     if (active.id !== over.id) {
-      const oldIndex = instructions.findIndex((item) => item.id === active.id);
-      const newIndex = instructions.findIndex((item) => item.id === over.id);
+      const oldIndex = instructions.findIndex((item:any) => item.id === active.id);
+      const newIndex = instructions.findIndex((item:any) => item.id === over.id);
       reorderInstructions(oldIndex, newIndex);
     }
   };
@@ -100,8 +100,8 @@ export default function Instructions({ setValue}:{ setValue:any}) {
       </div>
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <SortableContext items={instructions.map((i) => i.id)} strategy={verticalListSortingStrategy}>
-          {instructions.map((instruction) => (
+        <SortableContext items={instructions.map((i:any) => i.id)} strategy={verticalListSortingStrategy}>
+          {instructions.map((instruction:any) => (
             <SortableItem key={instruction.id} id={instruction.id}>
               <div className="relative flex items-start mt-4 gap-1">
                 <div className="absolute left-[-1rem] cursor-grab mt-4">

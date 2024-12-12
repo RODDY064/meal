@@ -27,7 +27,7 @@ export default function Profile({ name}:{name?:string}) {
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     router.refresh();
-    router.push('/auth/login')
+    router.push('/login')
   }
 
   return (

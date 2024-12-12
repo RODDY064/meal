@@ -8,7 +8,7 @@ import ActionModal from "./ui/recipe-modals/action-modal";
 
 export default function Home() {
   return (
-    <div className="flex flex-col items-center  my-12">
+    <div className="flex flex-col items-center  mt-12 z-10">
       <HeroText/>
       <Container/>
     </div>

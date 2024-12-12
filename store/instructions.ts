@@ -1,4 +1,5 @@
 import {  StateCreator } from "zustand";
+import { Store } from "./store";
 
 interface InstructionState {
   id: string;
@@ -7,7 +8,7 @@ interface InstructionState {
 
 interface InstructionFunction {
   instructions: InstructionState[];
-  addInstruction: (event:any) => void;
+  addInstruction: (event:any,text?:string) => void;
   updateInstruction: (id: string, text: string) => void;
   reorderInstructions: (fromIndex: number, toIndex: number) => void;
   intruText: (state: { instructions: { text: any; }[]; }) => void;
@@ -15,21 +16,23 @@ interface InstructionFunction {
   removeInstruction: (id: string) => void;
 }
 
-export type InstructionStore = InstructionFunction;
+export type InstructionStore = InstructionFunction ;
 
 export const useInstructionStore: StateCreator<
-  InstructionStore,
+  Store,
   [["zustand/immer", never]],
   [],
   InstructionStore> = (set) => ({
-    instructions: [] as InstructionState[],
-    addInstruction: (event:any) =>
+    instructions: [] ,
+    addInstruction: (event: any, text?: string) => {
+      const instructionText = text || (event?.target?.value as string) || '';
       set((state) => ({
         instructions: [
           ...state.instructions,
-          { id: `${Date.now()}`, text: event.target.value },
+          { id: `${Date.now()}`, text: instructionText },
         ],
-      })),
+      }));
+    },
     updateInstruction: (id, text) =>
       set((state) => ({
         instructions: state.instructions.map((instruction) =>

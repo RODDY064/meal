@@ -1,18 +1,19 @@
-import { StateCreator } from "zustand";
+import { type StateCreator } from "zustand";
 import { FetchRecipes } from "./recipe-store"; 
+import { Store } from "./store";
 
 // Search store
 export type SearchStore = {
   search: string; 
   category: string; 
-  searchData: FetchRecipes[] | null; 
+  searchData: any ; 
   setSearch: (search: string) => void; 
   setCategory: (category: string) => void;
   searching: (recipes: FetchRecipes[], search: string, category: string) => void; 
 };
 
 export const useSearchStore: StateCreator<
-  SearchStore,
+   Store,
   [["zustand/immer", never]],
   [],
   SearchStore

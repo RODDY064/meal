@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import Search from "./search";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -17,18 +17,19 @@ export default function Container() {
     searchData,
     search,
     searching,
-    category
+    category,
+    dataUpdated
   } = useBoundStore();
 
   useEffect(()=>{
     searching(publicRecipes, search, category)
   },[search, category, publicRecipes])
+  const ref = useRef(null)
 
-  // Fetch public recipes on mount
-
+  // Fetch public recipes on mount and when its changes  
   useEffect(() => {
     getPublicRecipes();
-  }, []);
+  }, [dataUpdated]);
 
   useGSAP(() => {
     gsap.registerPlugin(useGSAP);
@@ -36,19 +37,19 @@ export default function Container() {
     gsap.to(".container", {
       opacity: 1,
       duration: 1,
-      delay: 1.7,
+      delay: 1.8,
     });
-  });
+  },{ scope: ref});
 
   return (
-    <>
-      <div className="mt-12  flex flex-col items-center container opacity-0  z-10">
+    <div ref={ref} className="relative">
+      <div className="mt-12 mb-10 flex flex-col items-center container opacity-0  ">
         <Search />
-        <div className="mt-6 md:mt-12 flex flex-col md:flex-row  gap-4 w-screen max-w-7xl   px-6 md:px-12 xl:px-24 ">
+        <div className="mt-6 md:mt-12 flex flex-col md:flex-row  gap-4 w-screen max-w-7xl   px-6 md:px-12 xl:px-4 ">
           <Filter />
-          <div className="w-full flex gap-6 flex-col items-center md:flex-row md:items-start">
+          <div className="w-full gap-6 md:mt-0 mt-6 flex flex-col items-center md:flex-row relative flex-wrap overflow-hidden ">
             {recipeStatus === "loading" || recipeStatus === "idle" ? (
-              <div className="w-full md:w-[80%] text-white text-center h-12">
+              <div className="w-full md:w-[85%]  flex flex-col items-center h-12  text-white text-center ">
                 <Loader />
               </div>
             ) : recipeStatus === "error" ? (
@@ -71,6 +72,6 @@ export default function Container() {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
