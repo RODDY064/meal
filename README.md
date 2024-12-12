@@ -40,7 +40,8 @@ Replace your-project-url and your-anon-key with your Supabase project details.
 
 
 
-## Supabase Setup
+# Supabase Setup
+
 
 ### 1. Create a Supabase Project
 - Go to [Supabase](https://supabase.com/) and create a new project.
@@ -105,6 +106,24 @@ If your app includes images, follow these steps to set up storage in Supabase:
 3. Inside the `images` bucket, create a folder named `public`.
 
 Ensure that you set the appropriate access policies for the bucket if needed.
+
+
+## Supabase Authentication Setup
+
+
+
+1. Go to the **Authentication** section in the Supabase dashboard.
+2. Navigate to the **Settings** tab and select **Email & Password** under the sign-in methods.
+3. Enable the option to allow sign-ups using email and password.
+
+
+#### Disable Email Confirmation for Sign-Ups
+To disable the email confirmation step:
+
+1. In the **Settings** tab, scroll down to **Confirmation email** settings.
+2. Turn off the toggle for "Require email confirmation for sign-ups."
+
+This will allow users to log in immediately after signing up without confirming their email.
 
 ----
 
