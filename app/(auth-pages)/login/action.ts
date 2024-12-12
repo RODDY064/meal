@@ -5,13 +5,13 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import z from 'zod'
 import { loginSchema, registerSchema } from '../schema'
-import { AuthError } from '@supabase/supabase-js'
+import { AuthApiError, AuthError } from '@supabase/supabase-js'
+
+
 
 export async function login(formData: FormData) {
   const supabase = await createClient()
-
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
+   //validate the data 
   const data = loginSchema.safeParse({
     email: formData.get('email') as string,
     password: formData.get('password') as string,   
@@ -33,14 +33,17 @@ export async function login(formData: FormData) {
       case 'User not found':
         throw new Error('User not found')
       case 'Invalid login credentials':
-        throw new Error('Invalid username or password')
+        throw new Error('Invalid username or password',)
       default:
         throw new Error('Something went wrong')
     }
   }
 
   revalidatePath('/', 'layout')
-  redirect('/')
+  return {
+    status:"success" , message:"Login successfully"
+  }
+
 }
 
 export async function signup(formData: FormData) {
@@ -67,7 +70,7 @@ export async function signup(formData: FormData) {
     }
   })
 
-  if (error instanceof AuthError) {
+  if (error instanceof AuthApiError) {
     console.log(error, error.message)
     switch (error.message) {
       case 'Invalid email address':
@@ -80,5 +83,8 @@ export async function signup(formData: FormData) {
   }
 
   revalidatePath('/', 'layout')
-  redirect('/')
+  
+  return {
+    status:"success" , message:"Registered successfully"
+  }
 }

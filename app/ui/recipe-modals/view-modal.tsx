@@ -9,7 +9,7 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { usePathname, useRouter } from "next/navigation";
 import { useBoundStore } from "@/store/store";
-import DeleteModal from "./delete-modal.tsx 14-21-43-899";
+import DeleteModal from "./delete-modal";
 
 // view modal component
 

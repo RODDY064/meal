@@ -29,6 +29,7 @@ export type RecipeFunction = {
   recipeStatus: "idle" | "loading" | "error" | "success";
   isDelected:boolean,
   publicRecipes: FetchRecipes[];
+  singleRecipe:FetchRecipes | null,
   userRecipes: FetchRecipes[];
   removeRecipe: (id: string) => Promise<void>;
   setPublic: (id: string) => Promise<void>;
@@ -37,6 +38,7 @@ export type RecipeFunction = {
   recipesMessages?: string;
   dataUpdated: boolean;
   refeshData: () => void;
+  getSingleRecipe:(id:string) => Promise<void>;
 
 };
 
@@ -53,6 +55,7 @@ export const useRecipeStore: StateCreator<
   recipeStatus: "loading",
   publicRecipes: [],
   userRecipes: [],
+  singleRecipe:null,
   removeRecipe: async (id) => {
     set((state)=>({
       ...state,
@@ -186,9 +189,39 @@ export const useRecipeStore: StateCreator<
       }));
     }
   },
+  // refresh the data
   refeshData: () => {
     set((state) => ({
       dataUpdated: !state.dataUpdated,
     }));
+  },
+  getSingleRecipe:async (id) => {
+    set((state) => ({
+      recipeStatus: "loading",
+    }));
+
+    try {
+      const { data, error } = await supabase
+        .from("recipes")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (error) {
+        throw error;
+      }
+      // console.log(data)
+
+      set((state) => ({
+        recipeStatus: "success",
+        singleRecipe: data,
+      }));
+    } catch (error: any) {
+      console.error("Error fetching single recipe:", error.message);
+      set((state) => ({
+        recipeStatus: "error",
+        recipesMessages: error.message,
+      }));
+    }
   }
 });
