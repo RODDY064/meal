@@ -2,7 +2,7 @@
 
 **Meal** is your go-to platform for discovering, creating, and sharing delicious recipes. Whether you’re a seasoned chef or a kitchen newbie, explore a world of culinary inspiration in one simple, user-friendly hub.
 
----
+
 
 ## Features
 
@@ -10,7 +10,7 @@
 - **Edit Recipes**: Update your recipes with new ingredients or instructions.
 - **Publish Recipes**: Share your culinary creations with the world.
 
----
+
 
 ## Development Setup
 
@@ -38,7 +38,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 
 Replace your-project-url and your-anon-key with your Supabase project details.
 
----
+
 
 ## Supabase Setup
 
