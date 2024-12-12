@@ -77,10 +77,11 @@ export default function ViewModal() {
 
                 {user?.id && (
                   <div
-                    onClick={() => openModal("edit", viewData)}
                     className="flex gap-2 md:gap-4"
                   >
-                    <div className="flex items-center justify-center gap-1 cursor-pointer">
+                    <div 
+                    onClick={() => openModal("edit", viewData)}
+                    className="flex items-center justify-center gap-1 cursor-pointer">
                       <Image
                         src="/icons/edit.svg"
                         width={16}
