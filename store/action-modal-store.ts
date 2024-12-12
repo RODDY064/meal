@@ -40,7 +40,7 @@ export const useActionModalStore: StateCreator<
     set({ isOpen: true, type });
   },
   closeModal: (type) => {
-    set({ isOpen: false, type: type,});
+    set({ isOpen: false, type: type, instructions:[]});
   },
   createRecipe: async (recipe) => {
     // create recipe

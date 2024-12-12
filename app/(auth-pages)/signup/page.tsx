@@ -12,7 +12,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
 import { signup } from "../login/action";
 import toast from "react-hot-toast";
-import { AuthError } from "@supabase/supabase-js";
+import { AuthApiError, AuthError } from "@supabase/supabase-js";
+import { useRouter } from "next/navigation";
 
 export default function AuthSignUp() {
   const {
@@ -24,6 +25,8 @@ export default function AuthSignUp() {
     resolver: zodResolver(registerSchema),
   });
 
+  const router = useRouter()
+
   const onSubmit: SubmitHandler<z.infer<typeof registerSchema>> = async (data) => {
     try {
       // Convert data to FormData
@@ -33,14 +36,17 @@ export default function AuthSignUp() {
       });
   
       // Call the signup function 
-      await signup(formData).then(()=>{
-        toast.success('Signup successful');
-      });
-    } catch (err) {
-        if (err instanceof AuthError) {
+     const results =  await signup(formData)
+
+     if(results?.status === 'success'){
+      toast.success(results?.message)
+      // push to login upon successfull register
+      router.push('/login')
+     }
+    } catch (err:any) {
+        if (err instanceof AuthApiError) {
             toast.error(err.message || 'An error occurred');
         } 
-        toast.success('Signup successful');
     }
   };
 

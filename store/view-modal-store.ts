@@ -6,7 +6,7 @@ import { Store } from "./store";
 
 type ViewModalState = {
   viewOpen: boolean;
-  viewData: any;
+  viewData: FetchRecipes | null;
 };
 
 type ViewModalFunctions = {
@@ -21,11 +21,11 @@ export const useViewModalStore: StateCreator<
   [["zustand/immer",never]],
   [],ViewModalStore> = (set) => ({
   viewOpen: false,
-  viewData: null,
+  viewData:null ,
   openViewModal: (viewData) => {
     set({ viewOpen: true, viewData });
   },
   closeViewModal: () => {
-    set({ viewOpen: false, viewData: null });
+    set({ viewOpen: false, viewData: null,instructions:[] });
   },
 })

@@ -15,12 +15,16 @@ import { useBoundStore } from "@/store/store";
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
-export default function Instructions({ setValue}:{ setValue:any}) {
-  const [activeInstructionId, setActiveInstructionId] = useState<string | null>(null);
-  const textareaRefs = useRef<{ [key: string]: HTMLTextAreaElement | null }>({});
-  const [selectedInstructions, setSelectedInstructions] = useState<string[]>([]);
-
-
+export default function Instructions({ setValue }: { setValue: any }) {
+  const [activeInstructionId, setActiveInstructionId] = useState<string | null>(
+    null
+  );
+  const textareaRefs = useRef<{ [key: string]: HTMLTextAreaElement | null }>(
+    {}
+  );
+  const [selectedInstructions, setSelectedInstructions] = useState<string[]>(
+    []
+  );
 
   const {
     instructions,
@@ -31,25 +35,35 @@ export default function Instructions({ setValue}:{ setValue:any}) {
     type,
     isOpen,
     removeInstruction,
-    intruText
+    intruText,
   } = useBoundStore();
 
   const sensors = useSensors(useSensor(PointerSensor));
 
+  // handle drag
   const handleDragEnd = (event: any) => {
     const { active, over } = event;
     if (active.id !== over.id) {
-      const oldIndex = instructions.findIndex((item:any) => item.id === active.id);
-      const newIndex = instructions.findIndex((item:any) => item.id === over.id);
+      const oldIndex = instructions.findIndex(
+        (item: any) => item.id === active.id
+      );
+      const newIndex = instructions.findIndex(
+        (item: any) => item.id === over.id
+      );
       reorderInstructions(oldIndex, newIndex);
     }
   };
+
+  // reset instruction when modal close 
 
   useEffect(() => {
     if (type === "create" && !isOpen) {
       resetInstructions();
     }
   }, [isOpen, type]);
+
+
+
 
   useEffect(() => {
     // Focus the textarea when an instruction is activated
@@ -60,7 +74,6 @@ export default function Instructions({ setValue}:{ setValue:any}) {
       }
     }
   }, [activeInstructionId]);
-
 
   const handleRemoveSelectedInstructions = () => {
     selectedInstructions.forEach((id) => removeInstruction(id));
@@ -92,46 +105,49 @@ export default function Instructions({ setValue}:{ setValue:any}) {
             <p>Add </p>
           </div>
           {instructions.length > 0 && false && (
-            <div onClick={handleRemoveSelectedInstructions} className="cursor-pointer">
-              <Image src="/icons/delete.svg" width={20} height={20} alt="delete" />
+            <div
+              onClick={handleRemoveSelectedInstructions}
+              className="cursor-pointer"
+            >
+              <Image
+                src="/icons/delete.svg"
+                width={20}
+                height={20}
+                alt="delete"
+              />
             </div>
           )}
         </div>
       </div>
 
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <SortableContext items={instructions.map((i:any) => i.id)} strategy={verticalListSortingStrategy}>
-          {instructions.map((instruction:any) => (
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext
+          items={instructions.map((i: any) => i.id)}
+          strategy={verticalListSortingStrategy}
+        >
+          {instructions.map((instruction: any) => (
             <SortableItem key={instruction.id} id={instruction.id}>
               <div className="relative flex items-start mt-4 gap-1">
                 <div className="absolute left-[-1rem] cursor-grab mt-4">
-                  <Image src="/icons/drag.svg" width={16} height={16} alt="drag" />
+                  <Image
+                    src="/icons/drag.svg"
+                    width={16}
+                    height={16}
+                    alt="drag"
+                  />
                 </div>
 
                 {/* Instruction Textarea */}
-                <textarea
-                  ref={(el) => {
-                    textareaRefs.current[instruction.id] = el;
-                  }}
-                  value={instruction.text}
-                  name="instruction"
-                  onFocus={() => setActiveInstructionId(instruction.id)}
-                  onBlur={() => setActiveInstructionId(null)}
-                  onChange={(e) => updateInstruction(instruction.id, e.target.value)}
-                  className={cn(
-                    "w-full min-h-10 rounded-lg focus:outline-none border p-2 resize-none",
-                    activeInstructionId === instruction.id
-                      ? "border-primary-orange focus:border-primary-orange"
-                      : instruction.text?.length > 0
-                      ? "border-white hover:border-primary-orange"
-                      : "border-primary-orange/70",
-                    "hover:border-primary-orange focus:border-primary-orange"
-                  )}
-                  onInput={(e: any) => {
-                    e.target.style.height = "auto"; // Reset height
-                    e.target.style.height = `${e.target.scrollHeight}px`; // Set height based on content
-                  }}
-                />
+               <MyTextarea 
+               setActiveInstructionId={setActiveInstructionId}
+               instruction={instruction}
+               updateInstruction={updateInstruction}
+               activeInstructionId={activeInstructionId}/>
+
                 {/* <input 
                   type="checkbox" 
                   className="rounded-full mt-2"
@@ -146,3 +162,56 @@ export default function Instructions({ setValue}:{ setValue:any}) {
     </div>
   );
 }
+
+
+
+
+interface Instruction {
+  id: string;
+  text: string;
+}
+
+interface Props {
+  instruction: Instruction;
+  setActiveInstructionId: (id: string | null) => void;
+  updateInstruction: (id: string, text: string) => void;
+  activeInstructionId:any
+}
+
+const MyTextarea: React.FC<Props> = ({ instruction, setActiveInstructionId, updateInstruction ,activeInstructionId}) => {
+  const textareaRefs = useRef<Record<string, HTMLTextAreaElement | null>>({});
+
+  useEffect(() => {
+    if (textareaRefs.current[instruction.id]) {
+      if (textareaRefs.current[instruction.id]) {
+        textareaRefs.current[instruction.id]!.style.height = `${textareaRefs.current[instruction.id]!.scrollHeight}px`;
+      }
+    }
+  }, [instruction.text]);
+
+  return (
+    <textarea
+      ref={(el) => {
+        textareaRefs.current[instruction.id] = el;
+      }}
+      key={Date.now()}
+      value={instruction.text}
+      name="instruction"
+      onFocus={() => setActiveInstructionId(instruction.id)}
+      onBlur={() => setActiveInstructionId(null)}
+      onChange={(e) => updateInstruction(instruction.id, e.target.value)}
+      className={`w-full h-fit rounded-lg focus:outline-none border p-2 resize-none ${
+        activeInstructionId === instruction.id
+          ? "border-primary-orange focus:border-primary-orange"
+          : instruction.text?.length > 0
+          ? "border-white hover:border-primary-orange"
+          : "border-primary-orange/70"
+      } hover:border-primary-orange focus:border-primary-orange`}
+      onInput={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        e.target.style.height = "auto"; // Reset height
+        e.target.style.height = `${e.target.scrollHeight}px`; // Set height based on content
+      }}
+    />
+  );
+};
+

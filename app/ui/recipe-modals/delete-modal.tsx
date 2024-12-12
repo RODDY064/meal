@@ -17,13 +17,6 @@ export default function DeleteModal( { id}:{ id:string}) {
     }
 
 
-    useEffect(()=>{
-      if(isDelected){
-        toast.success('Recipe successfully deleted')
-      }
-     
-    },[isDelected])
-
 
   return (
       <div onClick={handleDelete} className="flex items-center justify-center gap-1 cursor-pointer">

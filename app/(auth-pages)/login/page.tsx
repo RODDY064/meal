@@ -1,9 +1,6 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { cn } from "@/utils/cn";
 import AuthHead from "@/app/ui/auth-head";
 import InputField from "@/app/ui/input-field";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -12,7 +9,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
 import { login } from "./action";
 import toast from "react-hot-toast";
-import { AuthError } from "@supabase/supabase-js";
+import { AuthApiError, AuthError } from "@supabase/supabase-js";
+import { useRouter } from "next/navigation";
 
 export default function AuthLogin() {
   
@@ -25,6 +23,8 @@ export default function AuthLogin() {
     resolver: zodResolver(loginSchema),
   });
 
+  const router = useRouter()
+
   const onSubmit: SubmitHandler<z.infer<typeof loginSchema>> = async (data) => {
     try {
       // Convert data to FormData
@@ -33,16 +33,23 @@ export default function AuthLogin() {
         formData.append(key, value as string);
       });
   
-      // Call the login function
-      await login(formData)
-    } catch (err) {
+     const results =  await login(formData);
 
-      if (err instanceof AuthError) {
+     if(results?.status === 'success'){
+      toast.success(results?.message)
+      // push to home upon successfull register
+      router.push('/')
+     }
+  
+      
+    } catch (err) {
+      console.log(err)
+      if (err instanceof AuthApiError) {
         toast.error(err.message || 'An error occurred');
       } 
-      toast.success('Login successful');
     }
   };
+  
 
   return (
     <div className="w-full flex flex-col items-center mt-24">

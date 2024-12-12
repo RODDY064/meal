@@ -29,7 +29,7 @@ export default function ActionModal() {
     viewData,
     addInstruction,
     editRecipe,
-    closeViewModal
+    closeViewModal,
   } = useBoundStore();
   const {
     register,
@@ -42,29 +42,45 @@ export default function ActionModal() {
   });
 
   // edit the recipe
+  const descriptionRef = useRef<HTMLTextAreaElement>(null);
+  const tagsRef = useRef<HTMLTextAreaElement>(null);
+
+
 
   useEffect(() => {
-    if (viewData) {
+    if (viewData && isOpen) {
       setValue("title", viewData?.title || "");
       setValue("description", viewData?.description || "");
       setValue("tags", viewData?.tags ? viewData?.tags.join(",") : "");
       setValue("category", viewData?.category);
       setValue("is_public", viewData?.is_public ?? false);
-      setValue('image_url',viewData.image_url)
+      setValue("image_url", viewData.image_url);
 
-      viewData.instructions.forEach((item:string) => {
+      viewData.instructions.forEach((item: string) => {
         addInstruction(null, item);
       });
     } else {
       setValue("title", "");
       setValue("description", "");
       setValue("tags", "");
-      setValue("category", "");
+      setValue("category", "Breakfast");
       setValue("instructions", []);
       setValue("is_public", false);
-      setValue('image_url','')
+      setValue("image_url", "");
     }
-  }, [viewData]);
+
+     // Adjust height of description and tags textareas
+     if (descriptionRef.current) {
+      descriptionRef.current.style.height = "auto";
+      descriptionRef.current.style.height = `${descriptionRef.current.scrollHeight}px`;
+    }
+
+    if (tagsRef.current) {
+      tagsRef.current.style.height = "auto";
+      tagsRef.current.style.height = `${tagsRef.current.scrollHeight}px`;
+    }
+    
+  }, [viewData, isOpen]);
 
   // submit function
   const onSubmit: SubmitHandler<z.infer<typeof recipeSchema>> = async (
@@ -83,12 +99,15 @@ export default function ActionModal() {
         ? await createRecipe(recipeData)
         : await editRecipe({ id: viewData?.id, ...recipeData });
 
-     toast.success(type === 'create' ? 'Recipe created successfully!' : 'Recipe updated successfully!');
+      toast.success(
+        type === "create"
+          ? "Recipe created successfully!"
+          : "Recipe updated successfully!"
+      );
 
-     
       reset();
       closeModal(type);
-      closeViewModal()
+      closeViewModal();
       refeshData();
     } catch (error) {
       console.log(error);
@@ -126,10 +145,10 @@ export default function ActionModal() {
 
   return (
     <div
-      className="action-modal w-full h-full fixed top-0 left-0 flex flex-col items-center lg:items-end p-4 z-[-20]
-     bg-white/30 pt-12 md:pt-4 overflow-y-scroll  opacity-0"
+
+      className="action-modal w-full h-full fixed top-0 left-0 flex flex-col items-center lg:items-end p-4 z-[-20] bg-white/30 pt-12 md:pt-4 overflow-y-scroll  opacity-0"
     >
-      <div className="action-inner-modal w-[96%] md:w-[70%]  lg:w-[42%] xl:w-2/6 h-fit md:min-h-full  break-inside-avoid  rounded-2xl md:rounded-3xl relative  bg-white bg-clip-padding border border-primary-orange/70 overflow-hidden">
+      <div className="action-inner-modal w-[96%] md:w-[70%]  lg:w-[42%] xl:w-2/6 h-full md:min-h-full  break-inside-avoid  rounded-2xl md:rounded-3xl relative  bg-white bg-clip-padding border border-primary-orange/70 md:overflow-hidden">
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="w-full h-full md:overflow-y-scroll md:p-4 p-3 overflow-x-visible"
@@ -172,6 +191,8 @@ export default function ActionModal() {
                 {...register("description", {
                   required: "Description is required",
                 })}
+
+                ref={descriptionRef}
                 placeholder="Write the description of the recipe"
                 className="w-full min-h-24 rounded-lg focus:outline-none hover:border-primary-orange/70 border border-white p-2 resize-none"
                 onInput={(e: any) => {
@@ -192,12 +213,21 @@ export default function ActionModal() {
               <div className="flex items-center">
                 <select
                   {...register("category")}
-                  className="w-full h-10  rounded-lg focus:outline-none
+                  className="w-full h-10 rounded-lg focus:outline-none
              hover:border-primary-orange/70 border border-white p-2 appearance-none cursor-pointer"
                 >
                   <option>Breakfast</option>
                   <option>Lunch</option>
+                  <option>Dinner</option>
+                  <option>Snack</option>
+                  <option>Dessert</option>
+                  <option>Appetizer</option>
+                  <option>Main Course</option>
+                  <option>Side Dish</option>
+                  <option>Soup</option>
+                  <option>Salad</option>
                 </select>
+
                 <Image
                   src="/icons/down-arrow.svg"
                   width={25}
@@ -219,6 +249,7 @@ export default function ActionModal() {
               </label>
               <textarea
                 {...register("tags")}
+                ref={tagsRef}
                 placeholder="Write the tags eg. breakfast, snacks "
                 className="w-full min-h-10  rounded-lg focus:outline-none border border-white hover:border-primary-orange/70  p-2 resize-none "
                 onInput={(e: any) => {
@@ -261,3 +292,4 @@ export default function ActionModal() {
     </div>
   );
 }
+
