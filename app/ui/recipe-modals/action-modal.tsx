@@ -253,8 +253,8 @@ export default function ActionModal() {
                 placeholder="Write the tags eg. breakfast, snacks "
                 className="w-full min-h-10  rounded-lg focus:outline-none border border-white hover:border-primary-orange/70  p-2 resize-none "
                 onInput={(e: any) => {
-                  e.target.style.height = "auto"; // Reset height
-                  e.target.style.height = `${e.target.scrollHeight}px`; // Set height based on content
+                  e.target.style.height = "auto"; 
+                  e.target.style.height = `${e.target.scrollHeight}px`; 
                 }}
               />
               {errors.tags && (
