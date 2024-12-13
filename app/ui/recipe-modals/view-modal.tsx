@@ -23,12 +23,10 @@ export default function ViewModal() {
   // animation
   useGSAP(() => {
     gsap.registerPlugin(useGSAP);
-    const tl = gsap.timeline({ paused: true });
+    const tl = gsap.timeline({ });
 
-    const viewModal = document.querySelector(".view-modal");
-
-    // Define animation sequence for opening the modal
-    tl.to(
+    if (viewOpen) {
+     tl.to(
       ".view-modal",
       {
         opacity: 1,
@@ -40,9 +38,6 @@ export default function ViewModal() {
       opacity: 1,
     });
 
-    if (viewOpen) {
-      // Play the opening animation
-      tl.play();
     } else {
     
         gsap.to(".modal", {
