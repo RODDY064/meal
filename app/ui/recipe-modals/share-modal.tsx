@@ -8,7 +8,9 @@ export default function ShareModal() {
         <Image src="/icons/share.svg" width={16} height={16} alt="share" />
         <p className=" text-sm  font-sans ">Share</p>
       </div>
-      {/* <div className="w-24 h-32 absolute bg-white shadow-card top-10 ">
+      {/* <div className="w-24 h-32 absolute bg-white border 
+      right-[12rem]
+       border-primary-orange/70 shadow-card top-10 ">
         hello
       </div> */}
     </>
