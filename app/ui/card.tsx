@@ -9,8 +9,6 @@ export default function Card({ recipes }: { recipes: FetchRecipes }) {
   const { openViewModal, closeViewModal, user } = useBoundStore();
   const modalRef = useRef<HTMLDivElement>(null);
 
-
-
   return (
     <div ref={modalRef} className="w-full md:w-auto">
       <div
@@ -59,16 +57,20 @@ export default function Card({ recipes }: { recipes: FetchRecipes }) {
               </p>
             </div>
             <div className="flex justify-between items-end px-1">
-              <div className="flex gap-1 w-1/2 truncate">
-                {recipes.tags.map((tag, index) => (
-                  <p
-                    key={index}
-                    className="font-sans text-sm bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent cursor-pointer mt-1 "
-                  >
-                    #{tag}
-                  </p>
-                ))}
+              <div className="flex gap-1 w-1/2 overflow-hidden">
+                <p className="flex gap-1 overflow-hidden truncate">
+                  {recipes.tags.map((tag, index) => (
+                    <span
+                      key={index}
+                      className="font-sans text-sm bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent cursor-pointer mt-1 truncate"
+                      title={`#${tag}`} // Tooltip to show full tag on hover
+                    >
+                      #{tag}
+                    </span>
+                  ))}
+                </p>
               </div>
+
               <p className="text-sm font-sans bg-gradient-to-r from-green-400 to-green-500 bg-clip-text text-transparent">
                 {recipes.category}
               </p>

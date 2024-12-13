@@ -40,10 +40,11 @@ export const useActionModalStore: StateCreator<
     set({ isOpen: true, type });
   },
   closeModal: (type) => {
-    set({ isOpen: false, type: type, instructions:[]});
+    set({ isOpen: false, type: type});
   },
   createRecipe: async (recipe) => {
     // create recipe
+
     try {
       const { data, error } = await supabase
     .from('recipes')
@@ -54,6 +55,7 @@ export const useActionModalStore: StateCreator<
         public_link: '',
       },
     ]);
+
 
     if(error) {
       console.log(error);
