@@ -45,8 +45,6 @@ export default function ActionModal() {
   const descriptionRef = useRef<HTMLTextAreaElement>(null);
   const tagsRef = useRef<HTMLTextAreaElement>(null);
 
-
-
   useEffect(() => {
     if (viewData && isOpen) {
       setValue("title", viewData?.title || "");
@@ -69,8 +67,8 @@ export default function ActionModal() {
       setValue("image_url", "");
     }
 
-     // Adjust height of description and tags textareas
-     if (descriptionRef.current) {
+    // Adjust height of description and tags textareas
+    if (descriptionRef.current) {
       descriptionRef.current.style.height = "auto";
       descriptionRef.current.style.height = `${descriptionRef.current.scrollHeight}px`;
     }
@@ -79,7 +77,6 @@ export default function ActionModal() {
       tagsRef.current.style.height = "auto";
       tagsRef.current.style.height = `${tagsRef.current.scrollHeight}px`;
     }
-    
   }, [viewData, isOpen]);
 
   // submit function
@@ -95,9 +92,7 @@ export default function ActionModal() {
       // console.log(recipeData);
 
       // call the  function base on the type
-      type === "create"
-        ? await createRecipe(recipeData)
-        : await editRecipe({ id: viewData?.id, ...recipeData });
+      type === "create" ? await createRecipe(recipeData) : await editRecipe({ id: viewData?.id, ...recipeData });
 
       toast.success(
         type === "create"
@@ -109,6 +104,7 @@ export default function ActionModal() {
       closeModal(type);
       closeViewModal();
       refeshData();
+
     } catch (error) {
       console.log(error);
     }
@@ -144,23 +140,18 @@ export default function ActionModal() {
   }, [isOpen]);
 
   return (
-    <div
-
-      className="action-modal w-full h-full fixed top-0 left-0 flex flex-col items-center lg:items-end p-4 z-[-20] bg-white/30 pt-12 md:pt-4 overflow-y-scroll  opacity-0"
-    >
-      <div className="action-inner-modal w-[96%] md:w-[70%]  lg:w-[42%] xl:w-2/6 h-full md:min-h-full  break-inside-avoid  rounded-2xl md:rounded-3xl relative  bg-white bg-clip-padding border border-primary-orange/70 md:overflow-hidden">
+    <div className="action-modal w-full h-full fixed top-0 left-0 flex flex-col items-center lg:items-end p-4 z-[-20] bg-white/30 pt-12 md:pt-4 overflow-y-scroll  opacity-0">
+      <div className="action-inner-modal w-[96%] md:w-[70%]  lg:w-[42%] xl:w-2/6 h-auto md:min-h-full  break-inside-avoid  rounded-2xl md:rounded-3xl relative  bg-white bg-clip-padding border border-primary-orange/70 md:overflow-hidden">
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="w-full h-full md:overflow-y-scroll md:p-4 p-3 overflow-x-visible"
-        >
+          className="w-full h-full md:overflow-y-scroll md:p-4 p-3 overflow-x-visible">
           <div className="flex justify-between">
             <h1 className="font-sans text-xl font-semibold">
               {type === "create" ? "Create" : "Edit"} a recipe
             </h1>
             <div
               onClick={() => closeModal(type)}
-              className="close-modal cursor-pointer size-8 rounded-full bg-white/10 shadow-[inset_10px_-50px_94px_0_rgb(199,199,199,0.2)] backdrop-blur flex justify-center items-center "
-            >
+              className="close-modal cursor-pointer size-8 rounded-full bg-white/10 shadow-[inset_10px_-50px_94px_0_rgb(199,199,199,0.2)] backdrop-blur flex justify-center items-center ">
               <Image
                 src="/icons/close.svg"
                 width={16}
@@ -188,11 +179,11 @@ export default function ActionModal() {
                 Desciption
               </label>
               <textarea
-                {...register("description", {
-                  required: "Description is required",
-                })}
-
-                ref={descriptionRef}
+                {...register("description")}
+                ref={(e) => {
+                  register("description").ref(e);
+                  descriptionRef.current = e; // Assign to ref
+                }}
                 placeholder="Write the description of the recipe"
                 className="w-full min-h-24 rounded-lg focus:outline-none hover:border-primary-orange/70 border border-white p-2 resize-none"
                 onInput={(e: any) => {
@@ -249,12 +240,15 @@ export default function ActionModal() {
               </label>
               <textarea
                 {...register("tags")}
-                ref={tagsRef}
+                ref={(e) => {
+                  register("tags").ref(e);
+                  tagsRef.current = e; // Assign to ref
+                }}
                 placeholder="Write the tags eg. breakfast, snacks "
                 className="w-full min-h-10  rounded-lg focus:outline-none border border-white hover:border-primary-orange/70  p-2 resize-none "
                 onInput={(e: any) => {
-                  e.target.style.height = "auto"; // Reset height
-                  e.target.style.height = `${e.target.scrollHeight}px`; // Set height based on content
+                  e.target.style.height = "auto";
+                  e.target.style.height = `${e.target.scrollHeight}px`;
                 }}
               />
               {errors.tags && (
@@ -292,4 +286,3 @@ export default function ActionModal() {
     </div>
   );
 }
-

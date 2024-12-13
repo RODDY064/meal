@@ -65,6 +65,9 @@ export const useActionModalStore: StateCreator<
     }},
   editRecipe: async (recipe) => {
     // edit recipe
+
+    console.log(recipe)
+
     const { data, error } = await supabase
       .from('recipes')
       .update(recipe)

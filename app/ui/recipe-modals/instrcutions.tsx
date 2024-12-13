@@ -200,7 +200,7 @@ const MyTextarea: React.FC<Props> = ({ instruction, setActiveInstructionId, upda
       onFocus={() => setActiveInstructionId(instruction.id)}
       onBlur={() => setActiveInstructionId(null)}
       onChange={(e) => updateInstruction(instruction.id, e.target.value)}
-      className={`w-full h-fit rounded-lg focus:outline-none border p-2 resize-none ${
+      className={`w-full h-auto rounded-lg focus:outline-none border p-2 resize-none ${
         activeInstructionId === instruction.id
           ? "border-primary-orange focus:border-primary-orange"
           : instruction.text?.length > 0
