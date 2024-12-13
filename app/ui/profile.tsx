@@ -41,7 +41,7 @@ export default function Profile({ name}:{name?:string}) {
       variants={list}
         animate={show ? "visible" : "hidden"}
         initial="hidden"
-        className="drop-down absolute z-30 w-[12rem] pb-4 border border-primary-orange/20 shadow-card backdrop-blur-[12px] mt-2 right-2 rounded-xl p-4 list-none flex flex-col gap-1">
+        className="drop-down absolute z-[80] bg-white w-[12rem] pb-4 border border-primary-orange/20 shadow-card  mt-2 right-2 rounded-xl p-4 list-none flex flex-col gap-1">
           <motion.li
            onClick={()=>openModal('create',null)}
            variants={item}  className="text-md font-medium hover:text-primary-orange cursor-pointer flex md:hidden">

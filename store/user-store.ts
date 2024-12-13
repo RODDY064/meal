@@ -7,7 +7,7 @@ import { Store } from "./store";
 const supabase = createClient();
 
 export type UserStore = {
-  user: any ;
+  user: User | null ;
   getUser: () => Promise<void>;
 };
 
