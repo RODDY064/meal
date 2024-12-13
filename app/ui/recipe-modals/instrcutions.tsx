@@ -12,7 +12,7 @@ import {
 import { SortableItem } from "./sortable-tab";
 import { cn } from "@/utils/cn";
 import { useBoundStore } from "@/store/store";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import Image from "next/image";
 
 export default function Instructions({ setValue }: { setValue: any }) {
@@ -21,9 +21,6 @@ export default function Instructions({ setValue }: { setValue: any }) {
   );
   const textareaRefs = useRef<{ [key: string]: HTMLTextAreaElement | null }>(
     {}
-  );
-  const [selectedInstructions, setSelectedInstructions] = useState<string[]>(
-    []
   );
 
   const {
@@ -55,15 +52,11 @@ export default function Instructions({ setValue }: { setValue: any }) {
   };
 
   // reset instruction when modal close 
-
   useEffect(() => {
     if (type === "create" && !isOpen) {
       resetInstructions();
     }
   }, [isOpen, type]);
-
-
-
 
   useEffect(() => {
     // Focus the textarea when an instruction is activated
@@ -75,18 +68,10 @@ export default function Instructions({ setValue }: { setValue: any }) {
     }
   }, [activeInstructionId]);
 
-  const handleRemoveSelectedInstructions = () => {
-    selectedInstructions.forEach((id) => removeInstruction(id));
-    setSelectedInstructions([]);
-  };
-
-  const handleCheckboxChange = (id: string) => {
-    setSelectedInstructions((prev) =>
-      prev.includes(id)
-        ? prev.filter((selectedId) => selectedId !== id)
-        : [...prev, id]
-    );
-  };
+  // Memoized add instruction handler to prevent unnecessary re-renders
+  const handleAddInstruction = useCallback((e:any) => {
+    addInstruction(e);
+  }, [addInstruction]);
 
   setValue("instructions", intruText({ instructions }));
 
@@ -98,25 +83,12 @@ export default function Instructions({ setValue }: { setValue: any }) {
         </label>
         <div className="flex items-center justify-center gap-2">
           <div
-            onClick={addInstruction}
+            onClick={handleAddInstruction}
             className="px-4 py-[6px] text-sm bg-black rounded-lg cursor-pointer text-white flex items-center gap-1"
           >
             <Image src="/icons/plus.svg" width={12} height={12} alt="plus" />
             <p>Add </p>
           </div>
-          {instructions.length > 0 && false && (
-            <div
-              onClick={handleRemoveSelectedInstructions}
-              className="cursor-pointer"
-            >
-              <Image
-                src="/icons/delete.svg"
-                width={20}
-                height={20}
-                alt="delete"
-              />
-            </div>
-          )}
         </div>
       </div>
 
@@ -141,19 +113,15 @@ export default function Instructions({ setValue }: { setValue: any }) {
                   />
                 </div>
 
-                {/* Instruction Textarea */}
-               <MyTextarea 
-               setActiveInstructionId={setActiveInstructionId}
-               instruction={instruction}
-               updateInstruction={updateInstruction}
-               activeInstructionId={activeInstructionId}/>
-
-                {/* <input 
-                  type="checkbox" 
-                  className="rounded-full mt-2"
-                  checked={selectedInstructions.includes(instruction.id)}
-                  onChange={() => handleCheckboxChange(instruction.id)}
-                /> */}
+                <MyTextarea 
+                  ref={(el) => {
+                    textareaRefs.current[instruction.id] = el;
+                  }}
+                  instruction={instruction}
+                  setActiveInstructionId={setActiveInstructionId}
+                  updateInstruction={updateInstruction}
+                  activeInstructionId={activeInstructionId}
+                />
               </div>
             </SortableItem>
           ))}
@@ -162,7 +130,6 @@ export default function Instructions({ setValue }: { setValue: any }) {
     </div>
   );
 }
-
 
 
 
@@ -175,43 +142,59 @@ interface Props {
   instruction: Instruction;
   setActiveInstructionId: (id: string | null) => void;
   updateInstruction: (id: string, text: string) => void;
-  activeInstructionId:any
+  activeInstructionId: string | null;
 }
 
-const MyTextarea: React.FC<Props> = ({ instruction, setActiveInstructionId, updateInstruction ,activeInstructionId}) => {
-  const textareaRefs = useRef<Record<string, HTMLTextAreaElement | null>>({});
+const MyTextarea = React.forwardRef<HTMLTextAreaElement, Props>(
+  ({ instruction, setActiveInstructionId, updateInstruction, activeInstructionId }, ref) => {
+    const internalRef = useRef<HTMLTextAreaElement>(null);
+    
+    // Combine external and internal refs
+    React.useImperativeHandle(ref, () => internalRef.current!);
 
-  useEffect(() => {
-    if (textareaRefs.current[instruction.id]) {
-      if (textareaRefs.current[instruction.id]) {
-        textareaRefs.current[instruction.id]!.style.height = `${textareaRefs.current[instruction.id]!.scrollHeight}px`;
+    useEffect(() => {
+      // Auto-adjust textarea height
+      if (internalRef.current) {
+        internalRef.current.style.height = 'auto';
+        internalRef.current.style.height = `${internalRef.current.scrollHeight}px`;
       }
-    }
-  }, [instruction.text]);
+    }, [instruction.text]);
 
-  return (
-    <textarea
-      ref={(el) => {
-        textareaRefs.current[instruction.id] = el;
-      }}
-      key={Date.now()}
-      value={instruction.text}
-      name="instruction"
-      onFocus={() => setActiveInstructionId(instruction.id)}
-      onBlur={() => setActiveInstructionId(null)}
-      onChange={(e) => updateInstruction(instruction.id, e.target.value)}
-      className={`w-full h-auto rounded-lg focus:outline-none border p-2 resize-none ${
-        activeInstructionId === instruction.id
-          ? "border-primary-orange focus:border-primary-orange"
-          : instruction.text?.length > 0
-          ? "border-white hover:border-primary-orange"
-          : "border-primary-orange/70"
-      } hover:border-primary-orange focus:border-primary-orange`}
-      onInput={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        e.target.style.height = "auto"; // Reset height
-        e.target.style.height = `${e.target.scrollHeight}px`; // Set height based on content
-      }}
-    />
-  );
-};
+    const handleFocus = () => {
+      setActiveInstructionId(instruction.id);
+    };
+
+    const handleBlur = () => {
+      setActiveInstructionId(null);
+    };
+
+    const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      // Adjust height
+      e.target.style.height = 'auto';
+      e.target.style.height = `${e.target.scrollHeight}px`;
+      
+      // Update instruction
+      updateInstruction(instruction.id, e.target.value);
+    };
+
+    return (
+      <textarea
+        ref={internalRef}
+        value={instruction.text}
+        name="instruction"
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+        onChange={handleChange}
+        className={`w-full h-auto rounded-lg focus:outline-none border p-2 resize-none ${
+          activeInstructionId === instruction.id
+            ? "border-primary-orange focus:border-primary-orange"
+            : instruction.text?.length > 0
+            ? "border-white hover:border-primary-orange"
+            : "border-primary-orange/70"
+        } hover:border-primary-orange focus:border-primary-orange`}
+      />
+    );
+  }
+);
+
 

@@ -28,8 +28,12 @@ export default function Container() {
 
   // Fetch public recipes on mount and when its changes  
   useEffect(() => {
-    getPublicRecipes();
+   getPublicRecipes();
   }, [dataUpdated]);
+
+  useEffect(()=>{
+    console.log(publicRecipes)
+  },[publicRecipes])
 
   useGSAP(() => {
     gsap.registerPlugin(useGSAP);

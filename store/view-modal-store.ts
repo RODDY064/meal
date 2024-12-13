@@ -26,6 +26,6 @@ export const useViewModalStore: StateCreator<
     set({ viewOpen: true, viewData });
   },
   closeViewModal: () => {
-    set({ viewOpen: false, viewData: null,instructions:[] });
+    set({ viewOpen: false, viewData: null });
   },
 })

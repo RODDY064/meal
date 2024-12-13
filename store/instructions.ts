@@ -1,5 +1,6 @@
 import {  StateCreator } from "zustand";
 import { Store } from "./store";
+import { v4 as uuidv4 } from 'uuid';
 
 interface InstructionState {
   id: string;
@@ -26,10 +27,12 @@ export const useInstructionStore: StateCreator<
     instructions: [] ,
     addInstruction: (event: any, text?: string) => {
       const instructionText = text || (event?.target?.value as string) || '';
+     const instructionId =  uuidv4();
+    
       set((state) => ({
         instructions: [
           ...state.instructions,
-          { id: `${Date.now()}`, text: instructionText },
+        { id: instructionId, text: instructionText },
         ],
       }));
     },

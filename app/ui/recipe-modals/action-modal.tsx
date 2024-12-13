@@ -30,6 +30,7 @@ export default function ActionModal() {
     addInstruction,
     editRecipe,
     closeViewModal,
+    resetInstructions,
   } = useBoundStore();
   const {
     register,
@@ -46,16 +47,27 @@ export default function ActionModal() {
   const tagsRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    if (viewData && isOpen) {
+    if (viewData && isOpen && type === 'edit') {
       setValue("title", viewData?.title || "");
       setValue("description", viewData?.description || "");
       setValue("tags", viewData?.tags ? viewData?.tags.join(",") : "");
       setValue("category", viewData?.category);
       setValue("is_public", viewData?.is_public ?? false);
       setValue("image_url", viewData.image_url);
-
+  
+      // Reset instructions before adding
+      resetInstructions();
+  
+      // Add instructions only if they don't already exist
       viewData.instructions.forEach((item: string) => {
-        addInstruction(null, item);
+        // Check if the instruction text is not already in the current instructions
+        const isDuplicate = instructions.some(
+          (existingInstruction) => existingInstruction.text === item
+        );
+  
+        if (!isDuplicate) {
+          addInstruction(null, item);
+        }
       });
     } else {
       setValue("title", "");
@@ -65,19 +77,20 @@ export default function ActionModal() {
       setValue("instructions", []);
       setValue("is_public", false);
       setValue("image_url", "");
+      resetInstructions();
     }
-
+  
     // Adjust height of description and tags textareas
     if (descriptionRef.current) {
       descriptionRef.current.style.height = "auto";
       descriptionRef.current.style.height = `${descriptionRef.current.scrollHeight}px`;
     }
-
     if (tagsRef.current) {
       tagsRef.current.style.height = "auto";
       tagsRef.current.style.height = `${tagsRef.current.scrollHeight}px`;
     }
-  }, [viewData, isOpen]);
+  }, [viewData, isOpen, type]);
+
 
   // submit function
   const onSubmit: SubmitHandler<z.infer<typeof recipeSchema>> = async (
@@ -92,7 +105,12 @@ export default function ActionModal() {
       // console.log(recipeData);
 
       // call the  function base on the type
-      type === "create" ? await createRecipe(recipeData) : await editRecipe({ id: viewData?.id, ...recipeData });
+      if(type === 'create'){
+       await createRecipe(recipeData);
+
+      }else{
+       await editRecipe({ id: viewData?.id, ...recipeData });
+      }
 
       toast.success(
         type === "create"
