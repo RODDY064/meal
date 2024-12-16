@@ -37,7 +37,7 @@ export default function ShareModal({
 
     setCopied("copying");
 
-    if (isPublic && !publicLink && publicLink !== link) {
+    if (isPublic && !publicLink && publicLink === '' && publicLink !== link) {
       setPublicLink(id, link);
       setLink(link);
       copyToClipboard(link);
